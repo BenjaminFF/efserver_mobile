@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>resetPassword</title>
+    <style>
+        body,html{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-self: center;
+        }
+        body,html,div{
+            margin: 0;
+            padding: 0;
+        }
+        .container{
+            width: 30rem;
+            height: 30rem;
+        }
+        .header{
+            width: 100%;
+            height: 3rem;
+            background-color: #17BFC8;
+            color: white;
+            text-align: center;
+            line-height: 3rem;
+            vertical-align: middle;
+        }
+        .content{
+            width: 100%;
+            height: 17rem;
+            border: 1px solid gray;
+            border-top: 0px;
+            box-sizing: border-box;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+      <div class="header">
+          ewordfun
+      </div>
+      <div class="content">
+          <div>亲爱的{{user}}，请点击下面的链接修改密码,链接24小时有效</div>
+          {{mLink|safe}}
+      </div>
+  </div>
+</body>
+<script>
+
+</script>
+</html>
