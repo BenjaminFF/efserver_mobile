@@ -14,6 +14,7 @@ module.exports = class extends think.Logic {
                 length: {min: 0, max: 255}
             },
             authorid: {
+                string:true,
                 required: true,
                 method: 'post',
                 length: {min: 10, max: 12}
@@ -28,6 +29,7 @@ module.exports = class extends think.Logic {
     listAction() {
         let rules = {
             authorid: {
+                string:true,
                 required: true,
                 method: 'post',
                 length: {min: 10, max: 12}
@@ -59,10 +61,10 @@ module.exports = class extends think.Logic {
         }
 
         let name = this.ctx.post('name');
-        let description=this.ctx.post('description');
+        let description = this.ctx.post('description');
         let isNameEmpty = (typeof name == 'string') && name.length == 0;   //validate的bug，name有两种情况，要么为undefined，要么长度不能为0
-        let notValidated=name===undefined&&description===undefined;
-        if (!this.validate(rules) || isNameEmpty||notValidated) {
+        let notValidated = name === undefined && description === undefined;
+        if (!this.validate(rules) || isNameEmpty || notValidated) {
             this.fail(402, '数据格式或者请求方法错误');
             return false;
         }

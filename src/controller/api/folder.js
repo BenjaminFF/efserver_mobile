@@ -11,7 +11,7 @@ module.exports = class extends think.Controller {
       let data = await model.where({authorid: authorid}).select();
       this.success(data);
     }catch (e) {
-      this.fail(403,'mysql异常');
+      this.fail(403,'数据库异常');
     }
   }
 
@@ -25,7 +25,7 @@ module.exports = class extends think.Controller {
       });
       this.success({fid:fid},'添加数据成功');
     }catch (e) {
-      this.fail(403,'mysql异常');
+      this.fail(403,'数据库异常');
     }
   }
 
@@ -38,7 +38,7 @@ module.exports = class extends think.Controller {
       let fid=await model.where({fid: this.ctx.post('fid')}).update(model.beforeUpdate(folder));
       await this.success({fid:fid},'修改folder成功');
     }catch (e) {
-      this.fail(403,'mysql异常');
+      this.fail(403,'数据库异常');
     }
   }
 

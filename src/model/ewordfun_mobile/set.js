@@ -1,35 +1,30 @@
 module.exports = class extends think.Model {
   //在创建的时候，默认让创建者成为使用者
-  async create(set, vocabularies, authorid) {
+  async create(authorid, name, description, terms) {
     try {
-      let vocabularyDB = await this.model('vocabulary').db(this.db());
-      let recordDB = await this.model('v_record').db(this.db());
-      let set_userDB = await this.model('set_user').db(this.db());
+      let termDB = await this.model('term').db(this.db());
+      let set_termDB = await this.model('set_term').db(this.db());
       await this.startTrans();
-      let sid = await this.add(set);
-      vocabularies.forEach((vocabulary) => {
-        vocabulary.sid = sid;
-        vocabulary.authorid = authorid;
+      let set={
+        name,
+        description,
+        term_count:terms.length,
+        uid:authorid,
+        authorid,
+        createtime:Date.now()
+      }
+      let sid=await this.add(set);
+      let tids=await termDB.addMany(terms);
+      let set_terms=[];
+      tids.forEach((tid)=>{
+        set_terms.push({tid,sid});
       });
-      let vidArr = await vocabularyDB.addMany(vocabularies);
-      let records = [];
-      vidArr.forEach((vid) => {
-        records.push({
-          sid: sid,
-          vid: vid,
-          uid: authorid
-        });
-      });
-      await recordDB.addMany(records);
-      await set_userDB.add({
-        uid: authorid,
-        sid: sid,
-        latest_learntime:set.createtime
-      });
+      await set_termDB.addMany(set_terms);
       await this.commit();
+      return sid;
     } catch (e) {
       await this.rollback();
-      console.log(e);
+      throw e;
     }
   }
 
