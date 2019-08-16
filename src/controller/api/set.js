@@ -25,7 +25,7 @@ module.exports = class extends think.Controller {
         let sid=this.ctx.post('sid');
         let data=await model.where({authorid,uid}).select();
         if(think.isEmpty(data)){
-            
+
             let set={
                 name:data.name,
                 description:data.description

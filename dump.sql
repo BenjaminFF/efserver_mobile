@@ -84,7 +84,7 @@ CREATE TABLE `set` (
   `write_learncount` int(11) NOT NULL DEFAULT '0',
   `stared` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`sid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,6 +93,7 @@ CREATE TABLE `set` (
 
 LOCK TABLES `set` WRITE;
 /*!40000 ALTER TABLE `set` DISABLE KEYS */;
+INSERT INTO `set` VALUES (18,'for benjamin','1',3,'7icjzc9x56p','7icjzc9x56p',1565946564760,0,0,0);
 /*!40000 ALTER TABLE `set` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,9 +107,9 @@ DROP TABLE IF EXISTS `set_term`;
 CREATE TABLE `set_term` (
   `sid` int(11) NOT NULL,
   `tid` int(11) NOT NULL,
-  `stared` tinyint(1) DEFAULT NULL,
+  `stared` tinyint(1) DEFAULT '0',
   `spell_comb_learned` tinyint(1) NOT NULL DEFAULT '0',
-  `write_learned` tinyint(1) NOT NULL
+  `write_learned` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -118,6 +119,7 @@ CREATE TABLE `set_term` (
 
 LOCK TABLES `set_term` WRITE;
 /*!40000 ALTER TABLE `set_term` DISABLE KEYS */;
+INSERT INTO `set_term` VALUES (18,28,0,0,0),(18,29,0,0,0),(18,30,0,0,0);
 /*!40000 ALTER TABLE `set_term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -130,11 +132,10 @@ DROP TABLE IF EXISTS `term`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `term` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,
-  `sid` int(11) NOT NULL,
   `term` char(32) NOT NULL,
   `definition` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`tid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,6 +144,7 @@ CREATE TABLE `term` (
 
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
+INSERT INTO `term` VALUES (28,'term1','definition1'),(29,'term2','definition2'),(30,'term3','definition3');
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -169,7 +171,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('7icjzc9x56p','本杰明','7f3c062810e5ba079c5aa585f42c9d56',1565848756609,'990460889@qq.com');
+INSERT INTO `user` VALUES ('7icjzc9x56p','本杰明','7f3c062810e5ba079c5aa585f42c9d56',1565848756609,'990460889@qq.com'),('a8jzdw6df5','托尼','7f3c062810e5ba079c5aa585f42c9d56',1565946604912,'1781530289@qq.com');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -182,4 +184,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-15 18:35:53
+-- Dump completed on 2019-08-16 17:28:26
