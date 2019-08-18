@@ -67,8 +67,9 @@ module.exports = class extends think.Logic {
                 required: true,
                 method: 'post'
             },
-            sid:{
-                int: true,
+            origin_id:{
+                length:{min:10,max:12},
+                string: true,
                 required: true,
                 method: 'post'
             }

@@ -1,13 +1,13 @@
--- MySQL dump 10.13  Distrib 8.0.17, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.11, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: ewordfun_mobile
 -- ------------------------------------------------------
--- Server version	8.0.17
+-- Server version	8.0.11
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
+ SET NAMES utf8mb4 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `folder`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `folder` (
   `fid` int(11) NOT NULL AUTO_INCREMENT,
   `authorid` char(12) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `folder` (
   `createtime` bigint(20) NOT NULL,
   PRIMARY KEY (`fid`),
   UNIQUE KEY `folder_fid_uindex` (`fid`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `folder` (
 
 LOCK TABLES `folder` WRITE;
 /*!40000 ALTER TABLE `folder` DISABLE KEYS */;
-INSERT INTO `folder` VALUES (1,'7icjzc9x56p','adsfs','adsfafasf',1565849395088),(25,'7icjzc9x56p','game of throne','1',1565855597014);
+INSERT INTO `folder` VALUES (1,'7icjzc9x56p','adsfs','adsfafasf',1565849395088),(25,'7icjzc9x56p','game of throne','1',1565855597014),(26,'7icjzc9x56p','game of throne','1',1566030511073);
 /*!40000 ALTER TABLE `folder` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,7 +49,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `folder_set`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `folder_set` (
   `fid` int(11) NOT NULL,
   `sid` int(11) NOT NULL
@@ -71,9 +71,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `set`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `set` (
   `sid` int(11) NOT NULL AUTO_INCREMENT,
+  `origin_id` char(12) NOT NULL,
   `name` char(30) NOT NULL,
   `description` char(255) DEFAULT NULL,
   `term_count` int(11) DEFAULT NULL,
@@ -84,7 +85,7 @@ CREATE TABLE `set` (
   `write_learncount` int(11) NOT NULL DEFAULT '0',
   `stared` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,7 +94,7 @@ CREATE TABLE `set` (
 
 LOCK TABLES `set` WRITE;
 /*!40000 ALTER TABLE `set` DISABLE KEYS */;
-INSERT INTO `set` VALUES (18,'for benjamin','1',3,'7icjzc9x56p','7icjzc9x56p',1565946564760,0,0,0);
+INSERT INTO `set` VALUES (19,'9fsjzfc7kwc','1','1',3,'7icjzc9x56p','7icjzc9x56p',1566034001411,0,0,0),(27,'9fsjzfc7kwc','1','1',3,'a8jzdw6df5','7icjzc9x56p',1566034001411,0,0,0);
 /*!40000 ALTER TABLE `set` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,7 +104,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `set_term`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `set_term` (
   `sid` int(11) NOT NULL,
   `tid` int(11) NOT NULL,
@@ -119,7 +120,7 @@ CREATE TABLE `set_term` (
 
 LOCK TABLES `set_term` WRITE;
 /*!40000 ALTER TABLE `set_term` DISABLE KEYS */;
-INSERT INTO `set_term` VALUES (18,28,0,0,0),(18,29,0,0,0),(18,30,0,0,0);
+INSERT INTO `set_term` VALUES (18,28,0,0,0),(18,29,0,0,0),(18,30,0,0,0),(19,31,0,0,0),(19,32,0,0,0),(19,33,0,0,0),(19,31,0,0,0),(19,32,0,0,0),(19,33,0,0,0);
 /*!40000 ALTER TABLE `set_term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -129,13 +130,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `term`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `term` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,
   `term` char(32) NOT NULL,
   `definition` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`tid`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,7 +145,7 @@ CREATE TABLE `term` (
 
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
-INSERT INTO `term` VALUES (28,'term1','definition1'),(29,'term2','definition2'),(30,'term3','definition3');
+INSERT INTO `term` VALUES (31,'term1','definition1'),(32,'term2','definition2'),(33,'term3','definition3');
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -154,7 +155,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `user` (
   `uid` char(12) NOT NULL,
   `name` char(30) NOT NULL,
@@ -184,4 +185,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-16 17:28:26
+-- Dump completed on 2019-08-18 22:29:50

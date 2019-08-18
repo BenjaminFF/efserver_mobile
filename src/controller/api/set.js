@@ -9,31 +9,45 @@ module.exports = class extends think.Controller {
     async createAction() {
         let authorid = this.ctx.post('authorid');
         let name = this.ctx.post('name');
+        let origin_id = uniqid.process();
         let description = this.ctx.post('description');
         let terms = JSON.parse(this.ctx.post('terms'));
         try {
-            let sid=await model.create(authorid, name, description, terms);
-            await this.success({sid},'创建Set成功');
-        }catch (e) {
-            this.fail(403,"数据库异常");
+            let sid = await model.create(origin_id, authorid, name, description, terms);
+            await this.success({sid}, '创建Set成功');
+        } catch (e) {
+            this.fail(403, "数据库异常");
         }
     }
 
     async shareAction() {
         let authorid = this.ctx.post('authorid');
         let uid = this.ctx.post('uid');
-        let sid=this.ctx.post('sid');
-        let data=await model.where({authorid,uid}).select();
-        if(think.isEmpty(data)){
-
-            let set={
-                name:data.name,
-                description:data.description
-            }
-            await model.add()
+        let origin_id = this.ctx.post('origin_id');
+        let sets = await model.where({authorid, origin_id}).select();
+        let existUser = sets.find((set) => set.uid == uid) != undefined;
+        if (existUser) {
+            this.fail(401, "用户已存在该单词集");
+        } else if(sets.length==0){
+            this.fail(401, "需要分享的单词集不存在");
         }else {
-            this.fail(401,"用户已存在该单词集");
+            let set = {
+                origin_id: origin_id,
+                name: sets[0].name,
+                description: sets[0].description,
+                term_count: sets[0].term_count,
+                uid: uid,
+                authorid: authorid,
+                createtime: sets[0].createtime
+            }
+            try {
+                let sid = await model.share(set,sets[0].sid);
+                await this.success({sid}, '分享Set成功');
+            } catch (e) {
+                this.fail(403, "数据库异常");
+            }
         }
+
     }
 
     //remove set indicates that it's vocabularies and records about user will be removed too.
