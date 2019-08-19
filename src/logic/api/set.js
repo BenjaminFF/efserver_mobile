@@ -3,7 +3,7 @@ module.exports = class extends think.Logic {
         let rules = {
             authorid: {
                 string: true,
-                length:{min:10,max:12},
+                length: {min: 10, max: 12},
                 required: true,
                 method: 'post'
             },
@@ -20,7 +20,7 @@ module.exports = class extends think.Logic {
             },
             terms: {
                 required: true,
-                string:true,
+                string: true,
                 method: 'POST',
                 jsonSchema: {
                     "type": "array",
@@ -53,25 +53,93 @@ module.exports = class extends think.Logic {
     }
 
 
-    shareAction(){
-        let rules={
+    shareAction() {
+        let rules = {
             authorid: {
                 string: true,
-                length:{min:10,max:12},
+                length: {min: 10, max: 12},
                 required: true,
                 method: 'post'
             },
             uid: {
                 string: true,
-                length:{min:10,max:12},
+                length: {min: 10, max: 12},
                 required: true,
                 method: 'post'
             },
-            origin_id:{
-                length:{min:10,max:12},
+            origin_id: {
+                length: {min: 10, max: 12},
                 string: true,
                 required: true,
                 method: 'post'
+            }
+        }
+
+        if (!this.validate(rules)) {
+            this.fail(402, '数据格式或者请求方法错误');
+            return false;
+        }
+    }
+
+    acquireAction() {
+        let rules = {
+            sid: {
+                int: true,
+                required: true,
+                method: 'get'
+            },
+            origin_id: {
+                length: {min: 10, max: 12},
+                string: true,
+                required: true,
+                method: 'get'
+            }
+        }
+
+        if (!this.validate(rules)) {
+            this.fail(402, '数据格式或者请求方法错误');
+            return false;
+        }
+    }
+
+    updateAction() {
+        let rules = {
+            set: {
+                required: true,
+                string: true,
+                method: 'POST',
+                jsonSchema: {
+                    "type": "object",
+                    "required": ["sid"],
+                    //"maxProperties": 6,
+                    "properties": {
+                        "sid": {
+                            "type": "number"
+                        },
+                        "term": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 32
+                        },
+                        "definition": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512
+                        },
+                        "spell_comb_learncount":{
+                            "type": "number",
+                        },
+                        "write_learncount":{
+                            "type": "number",
+                        },
+                        "stared":{
+                            "type": "number",
+                            "minimum":0,
+                            "maximum":1
+
+                        }
+                    }
+                }
             }
         }
 

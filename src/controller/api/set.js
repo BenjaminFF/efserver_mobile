@@ -41,7 +41,7 @@ module.exports = class extends think.Controller {
                 createtime: sets[0].createtime
             }
             try {
-                let sid = await model.share(set,sets[0].sid);
+                let sid = await model.share(set);
                 await this.success({sid}, '分享Set成功');
             } catch (e) {
                 this.fail(403, "数据库异常");
@@ -50,14 +50,29 @@ module.exports = class extends think.Controller {
 
     }
 
+    async acquireAction() {
+        try{
+            let data = await model.acquire(this.ctx.query.sid, this.ctx.query.origin_id);
+            await this.success(data, '获取Set数据成功');
+        }catch (e) {
+            this.fail(403,"数据库异常");
+        }
+    }
+
+    //后面加了权限还要判断该单词集的作者是不是当前用户
+    async updateAction() {
+        let set = JSON.parse(this.ctx.post('set'));
+        let updated=await model.where({sid: set.sid}).update(set);
+        if(updated){
+            this.success({sid:set.sid},"更新成功");
+        }else {
+           this.fail(401,"需要更新的单词集不存在或者该单词集的作者不属于该用户");
+        }
+    }
+
     //remove set indicates that it's vocabularies and records about user will be removed too.
     removeAction() {
         model.remove(this.ctx.post('sid'));
-    }
-
-    async acquireAction() {
-        console.log(uniqid.process());
-        this.body = await model.acquire(this.ctx.query.sid, this.ctx.query.uid);
     }
 
     //update set and vocabularies both
@@ -68,27 +83,9 @@ module.exports = class extends think.Controller {
         model.updateSV(set, vocabularies);
     }
 
-    //update set info
-    async updateAction() {
-        let set = JSON.parse(this.ctx.post('set'));
-        await model.where({sid: set.sid}).update(set);
-    }
-
     //this will be modified after the set can be shared.
-    async list_of_authorAction() {
+    async listAction() {
         let authorid = this.ctx.cookie('uid');
         this.body = await model.where({authorid: authorid}).select();
-    }
-
-    //this will be modified after the set can be shared.
-    async list_of_userAction() {
-        let uid = this.ctx.cookie('uid');
-        this.body = await model.listOfUser(uid);
-    }
-
-    //update set's record, if you finish a round of matrix or write etc.
-    async updateRecordAction() {
-        let setRecord = JSON.parse(this.ctx.post('setRecord'));
-        model.updateRecord(setRecord);
     }
 }
