@@ -148,4 +148,35 @@ module.exports = class extends think.Logic {
             return false;
         }
     }
+
+    listAction(){
+        let rules = {
+            uid: {
+                length: {min: 10, max: 12},
+                string: true,
+                required: true,
+                method: 'get'
+            }
+        }
+
+        if (!this.validate(rules)) {
+            this.fail(402, '数据格式或者请求方法错误');
+            return false;
+        }
+    }
+
+    removeAction(){
+        let rules = {
+            sid: {
+                int:true,
+                required: true,
+                method: 'post'
+            }
+        }
+
+        if (!this.validate(rules)) {
+            this.fail(402, '数据格式或者请求方法错误');
+            return false;
+        }
+    }
 }

@@ -28,9 +28,9 @@ module.exports = class extends think.Controller {
         let existUser = sets.find((set) => set.uid == uid) != undefined;
         if (existUser) {
             this.fail(401, "用户已存在该单词集");
-        } else if(sets.length==0){
+        } else if (sets.length == 0) {
             this.fail(401, "需要分享的单词集不存在");
-        }else {
+        } else {
             let set = {
                 origin_id: origin_id,
                 name: sets[0].name,
@@ -51,41 +51,47 @@ module.exports = class extends think.Controller {
     }
 
     async acquireAction() {
-        try{
+        try {
             let data = await model.acquire(this.ctx.query.sid, this.ctx.query.origin_id);
             await this.success(data, '获取Set数据成功');
-        }catch (e) {
-            this.fail(403,"数据库异常");
+        } catch (e) {
+            this.fail(403, "数据库异常");
         }
     }
 
     //后面加了权限还要判断该单词集的作者是不是当前用户
     async updateAction() {
-        let set = JSON.parse(this.ctx.post('set'));
-        let updated=await model.where({sid: set.sid}).update(set);
-        if(updated){
-            this.success({sid:set.sid},"更新成功");
-        }else {
-           this.fail(401,"需要更新的单词集不存在或者该单词集的作者不属于该用户");
+        try {
+            let set = JSON.parse(this.ctx.post('set'));
+            let updated = await model.where({sid: set.sid}).update(set);
+            if (updated) {
+                this.success({sid: set.sid}, "更新成功");
+            } else {
+                this.fail(401, "需要更新的单词集不存在或者该单词集的作者不属于该用户");
+            }
+        } catch (e) {
+            this.fail(403, "数据库异常");
         }
     }
 
-    //remove set indicates that it's vocabularies and records about user will be removed too.
-    removeAction() {
-        model.remove(this.ctx.post('sid'));
-    }
-
-    //update set and vocabularies both
-    updateSVAction() {
-        let set = JSON.parse(this.ctx.post('set'));
-        let vocabularies = JSON.parse(this.ctx.post('vocabularies'));
-        set.vcount = vocabularies.length;     //!important
-        model.updateSV(set, vocabularies);
-    }
-
-    //this will be modified after the set can be shared.
+    //
     async listAction() {
-        let authorid = this.ctx.cookie('uid');
-        this.body = await model.where({authorid: authorid}).select();
+        try {
+            let uid = this.ctx.query.uid;
+            let sets = await model.where({uid: uid}).select();
+            this.success({sets}, "查找sets成功");
+        } catch (e) {
+            this.fail(403, "数据库异常");
+        }
+    }
+
+    //remove是删除当前用户的set和它在set_term里的记录，term不会删除, 后面加了权限也要还要判断该单词集的使用者是不是当前用户
+    removeAction() {
+        try {
+            let sid=model.remove(this.ctx.post('sid'));
+            this.success({sid:sid},"删除成功");
+        } catch (e) {
+            this.fail(403, "数据库异常");
+        }
     }
 }

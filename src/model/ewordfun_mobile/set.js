@@ -1,5 +1,5 @@
 module.exports = class extends think.Model {
-    //在创建的时候，默认让创建者成为使用者
+    //在创建的时候，默认让创建者成为使用者    ok
     async create(origin_id, authorid, name, description, terms) {
         try {
             let termDB = await this.model('term').db(this.db());
@@ -33,6 +33,7 @@ module.exports = class extends think.Model {
         }
     }
 
+    //ok
     async share(set) {
         try {
             let set_termDB = await this.model('set_term').db(this.db());
@@ -54,6 +55,7 @@ module.exports = class extends think.Model {
         }
     }
 
+    //ok
     async acquire(sid, origin_id) {
         try {
             let termDB = await this.model('term').db(this.db());
@@ -82,34 +84,18 @@ module.exports = class extends think.Model {
         }
     }
 
+    //先保留，后面加了权限再改
     async remove(sid) {
         try {
-            let vocabularyDB = await this.model('vocabulary').db(this.db());
-            let recordDB = await this.model('v_record').db(this.db());
-            let set_userDB = await this.model('set_user').db(this.db());
+            let set_termDB = await this.model('set_term').db(this.db());
             await this.startTrans();
-            await this.where({sid: sid}).delete();
-            await vocabularyDB.where({sid: sid}).delete();
-            await recordDB.where({sid: sid}).delete();
-            await set_userDB.where({sid: sid}).delete();
+            await set_termDB.where({sid}).delete();
+            await this.where({sid}).delete();
             await this.commit();
+            return sid;
         } catch (e) {
             await this.rollback();
-        }
-    }
-
-    //updateSV include vocabularies
-    async updateSV(set, vocabularies) {
-        try {
-            let vocabularyDB = await this.model('vocabulary').db(this.db());
-            vocabularyDB._pk = 'vid';
-            await this.startTrans();
-            await this.where({sid: set.sid}).update(set);
-            await vocabularyDB.updateMany(vocabularies);
-            await this.commit();
-        } catch (e) {
-            await this.rollback();
-            console.log(e);
+            throw e;
         }
     }
 };
