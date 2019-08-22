@@ -5,9 +5,9 @@ module.exports = class extends think.Controller {
         //添加权限
     }
 
-    //create set indicates that it's vocabulary will be created, and record will be initialized.
+    //创建set、该set的term、该set的term记录  ok了
     async createAction() {
-        let authorid = this.ctx.post('authorid');
+        let authorid = this.ctx.cookie('uid');
         let name = this.ctx.post('name');
         let origin_id = uniqid.process();
         let description = this.ctx.post('description');
@@ -20,9 +20,10 @@ module.exports = class extends think.Controller {
         }
     }
 
+    //ok了
     async shareAction() {
         let authorid = this.ctx.post('authorid');
-        let uid = this.ctx.post('uid');
+        let uid = this.ctx.cookie('uid');
         let origin_id = this.ctx.post('origin_id');
         let sets = await model.where({authorid, origin_id}).select();
         let existUser = sets.find((set) => set.uid == uid) != undefined;
@@ -47,25 +48,41 @@ module.exports = class extends think.Controller {
                 this.fail(403, "数据库异常");
             }
         }
-
     }
 
+    //ok了
     async acquireAction() {
         try {
             let data = await model.acquire(this.ctx.query.sid, this.ctx.query.origin_id);
-            await this.success(data, '获取Set数据成功');
+            if (data.errno == 0) {
+                this.success({set: data.set, terms: data.terms}, '获取Set数据成功');
+            } else {
+                this.fail(data.errno, data.errmsg);
+            }
         } catch (e) {
             this.fail(403, "数据库异常");
         }
     }
 
-    //后面加了权限还要判断该单词集的作者是不是当前用户
+    //ok了
+    async listAction() {
+        try {
+            let uid = this.ctx.cookie('uid');
+            let sets = await model.where({uid}).select();
+            this.success({sets}, "查找sets成功");
+        } catch (e) {
+            this.fail(403, "数据库异常");
+        }
+    }
+
+    ////set name和description只有用户(uid关联的)才能修改
     async updateAction() {
         try {
             let set = JSON.parse(this.ctx.post('set'));
-            let updated = await model.where({sid: set.sid}).update(set);
+            let authorid = this.ctx.cookie('uid');
+            let updated = await model.where({origin_id: set.origin_id, authorid}).update(set);
             if (updated) {
-                this.success({sid: set.sid}, "更新成功");
+                this.success({origin_id: set.origin_id}, "更新成功");
             } else {
                 this.fail(401, "需要更新的单词集不存在或者该单词集的作者不属于该用户");
             }
@@ -74,22 +91,35 @@ module.exports = class extends think.Controller {
         }
     }
 
-    //
-    async listAction() {
+    //set record只有用户(uid关联的)才能修改
+    async updateRecordAction() {
         try {
-            let uid = this.ctx.query.uid;
-            let sets = await model.where({uid: uid}).select();
-            this.success({sets}, "查找sets成功");
+            let set = JSON.parse(this.ctx.post('set'));
+            let uid = this.ctx.cookie('uid');
+            let updated = await model.where({sid: set.sid, uid}).update(set);
+            if (updated) {
+                this.success({sid:set.sid},"更新单词集记录成功");
+            } else {
+                this.fail(401, "需要更新的单词集不存在或者该单词集的作者不属于该用户");
+            }
         } catch (e) {
             this.fail(403, "数据库异常");
         }
     }
 
-    //remove是删除当前用户的set和它在set_term里的记录，term不会删除, 后面加了权限也要还要判断该单词集的使用者是不是当前用户
-    removeAction() {
+    //remove: 只删除set和set的记录（set_term）。如果该set已没有使用者，就删除它的term
+    async removeAction() {
         try {
-            let sid=model.remove(this.ctx.post('sid'));
-            this.success({sid:sid},"删除成功");
+            let sid=this.ctx.post('sid');
+            let origin_id=this.ctx.post('origin_id');
+            let uid=this.ctx.cookie('uid');
+            let set=await model.where({sid,origin_id,uid}).find();
+            if(think.isEmpty(set)){
+                this.fail(401,"需要删除的单词集不存在或者该单词集不属于该用户");
+            }else {
+                await model.remove(sid,origin_id);
+                this.success({sid}, "删除单词集成功");
+            }
         } catch (e) {
             this.fail(403, "数据库异常");
         }

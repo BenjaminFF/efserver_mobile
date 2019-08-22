@@ -1,12 +1,6 @@
 module.exports = class extends think.Logic {
     createAction() {
         let rules = {
-            authorid: {
-                string: true,
-                length: {min: 10, max: 12},
-                required: true,
-                method: 'post'
-            },
             name: {
                 string: true,
                 required: true,
@@ -61,12 +55,6 @@ module.exports = class extends think.Logic {
                 required: true,
                 method: 'post'
             },
-            uid: {
-                string: true,
-                length: {min: 10, max: 12},
-                required: true,
-                method: 'post'
-            },
             origin_id: {
                 length: {min: 10, max: 12},
                 string: true,
@@ -102,65 +90,89 @@ module.exports = class extends think.Logic {
         }
     }
 
-    updateAction() {
-        let rules = {
-            set: {
-                required: true,
-                string: true,
-                method: 'POST',
-                jsonSchema: {
-                    "type": "object",
-                    "required": ["sid"],
-                    //"maxProperties": 6,
-                    "properties": {
-                        "sid": {
-                            "type": "number"
+    //ok了
+    updateAction(){
+        try{
+            let rules = {
+                set: {
+                    required: true,
+                    string: true,
+                    method: 'POST',
+                    jsonSchema: {
+                        "type": "object",
+                        "required": ["origin_id"],
+                        //"maxProperties": 6,
+                        "properties": {
+                            "origin_id": {
+                                "type": "string",
+                                "minLength": 10,
+                                "maxLength": 12
+                            },
+                            "name": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 30
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            },
                         },
-                        "term": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 32
-                        },
-                        "definition": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 512
-                        },
-                        "spell_comb_learncount":{
-                            "type": "number",
-                        },
-                        "write_learncount":{
-                            "type": "number",
-                        },
-                        "stared":{
-                            "type": "number",
-                            "minimum":0,
-                            "maximum":1
-
-                        }
+                        "additionalProperties":false
                     }
                 }
             }
-        }
 
-        if (!this.validate(rules)) {
-            this.fail(402, '数据格式或者请求方法错误');
+            if (!this.validate(rules)) {
+                this.fail(402, '数据格式或者请求方法错误');
+                return false;
+            }
+        }catch (e) {
+            this.fail(401,'JSON格式不正确');
             return false;
         }
+
     }
 
-    listAction(){
-        let rules = {
-            uid: {
-                length: {min: 10, max: 12},
-                string: true,
-                required: true,
-                method: 'get'
+    //ok了
+    updateRecordAction() {
+        try{
+            let rules = {
+                set: {
+                    required: true,
+                    string: true,
+                    method: 'POST',
+                    jsonSchema: {
+                        "type": "object",
+                        "required": ["sid"],
+                        //"maxProperties": 6,
+                        "properties": {
+                            "sid": {
+                                "type": "number"
+                            },
+                            "spell_comb_learncount":{
+                                "type": "number",
+                            },
+                            "write_learncount":{
+                                "type": "number",
+                            },
+                            "stared":{
+                                "type": "number",
+                                "minimum":0,
+                                "maximum":1
+                            }
+                        },
+                        "additionalProperties":false
+                    }
+                }
             }
-        }
-
-        if (!this.validate(rules)) {
-            this.fail(402, '数据格式或者请求方法错误');
+            if (!this.validate(rules)) {
+                this.fail(402, '数据格式或者请求方法错误');
+                return false;
+            }
+        }catch (e) {
+            this.fail(401,'JSON格式不正确');
             return false;
         }
     }
@@ -169,6 +181,12 @@ module.exports = class extends think.Logic {
         let rules = {
             sid: {
                 int:true,
+                required: true,
+                method: 'post'
+            },
+            origin_id: {
+                length: {min: 10, max: 12},
+                string: true,
                 required: true,
                 method: 'post'
             }

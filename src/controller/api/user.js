@@ -3,8 +3,29 @@ const model = think.model('ewordfun_mobile/user');
 const svgCaptcha = require('svg-captcha');
 const nodemailer = require('nodemailer');
 module.exports = class extends think.Controller {
-    __before() {
-
+    async __before() {
+        let nonce_urls = ['/api/user/login', '/api/user/validate'];     //需要保持每次请求唯一性的url
+        if (nonce_urls.includes(this.ctx.url)) {
+            console.log(Date.now());
+            let timestamp = this.ctx.post('timestamp');
+            let nonce = this.ctx.post('nonce');
+            if (Date.now() - timestamp > 60 * 1000) {
+                this.fail(406, '非法请求');
+                return false;
+            }
+            let cache_nonce = await this.cache(nonce, undefined);
+            if (cache_nonce == undefined) {
+                await this.cache(nonce, nonce, {
+                    type: 'redis',
+                    redis: {
+                        timeout: 60 * 1000
+                    }
+                })
+            } else {
+                this.fail(406, '非法请求');
+                return false;
+            }
+        }
     }
 
     async addAction() {
@@ -31,24 +52,31 @@ module.exports = class extends think.Controller {
     async loginAction() {
         const email = this.ctx.post('email');
         const password = think.md5(this.ctx.post('password'));
-        let data = await model.where({email: email, password: password}).find();
-        if (think.isEmpty(data)) {
-            this.body = {validated: false};
-        } else {
-            let userInfo = {
-                uid: data.uid,
-                loginTime: Date.now(),
-                uip: this.ctx.header['x-real-ip']
-            };
-            await this.cookie('uid', userInfo.uid, {maxAge: 24 * 3600 * 1000 * 20});
-            await this.cache(userInfo.uid, JSON.stringify(userInfo), {
-                type: 'redis',
-                redis: {
-                    timeout: 24 * 3600 * 1000 * 20
-                }
-            });
-            await this.session(userInfo.uid, JSON.stringify(userInfo), {maxAge: 24 * 3600 * 1000 * 20});
-            this.body = {validated: true, name: data.name, email: data.email};
+        try {
+            let data = await model.where({email: email, password: password}).find();
+            if (think.isEmpty(data)) {
+                this.fail(401, '账号或密码错误');
+            } else {
+                let loginTime = Date.now();
+                let autoExpireTime = loginTime + 24 * 3600 * 1000 * 20;
+                let userInfo = {
+                    uid: data.uid,
+                    loginTime,
+                    autoExpireTime,
+                    uip: this.ctx.header['x-real-ip']
+                };
+                await this.cookie('uid', userInfo.uid, {maxAge: 24 * 3600 * 1000 * 20});
+                await this.cache(userInfo.uid, JSON.stringify(userInfo), {
+                    type: 'redis',
+                    redis: {
+                        timeout: 24 * 3600 * 1000 * 20
+                    }
+                });
+                await this.session(userInfo.uid, JSON.stringify(userInfo), {maxAge: 24 * 3600 * 1000 * 20});
+                this.success({email: data.email, name: data.name}, '登录成功');
+            }
+        } catch (e) {
+            this.fail(403, "数据库异常");
         }
     }
 

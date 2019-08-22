@@ -38,9 +38,24 @@ module.exports = class extends think.Logic {
         email: true,
         method: 'post',
         length: {max: 64}
+      },
+      timestamp:{
+        required: true,
+        int: true,
+        method: 'post'
+      },
+      nonce:{
+        string:true,
+        required: true,
+        method: 'post',
+        length: {min: 12, max: 64}
       }
     };
-    return this.validate(rules);
+
+    if (!this.validate(rules)) {
+      this.fail(402, '数据格式或者请求方法错误');
+      return false;
+    }
   }
 
   validateAction() {

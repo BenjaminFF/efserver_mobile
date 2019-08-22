@@ -18,11 +18,12 @@ module.exports = class extends think.Model {
 
             terms.forEach((term) => {
                 term.origin_id = origin_id;
+                term.authorid = authorid;
             })
             let tids = await termDB.addMany(terms);
             let set_terms = [];
             tids.forEach((tid) => {
-                set_terms.push({tid, sid});
+                set_terms.push({tid, sid, uid: authorid});
             });
             await set_termDB.addMany(set_terms);
             await this.commit();
@@ -44,7 +45,7 @@ module.exports = class extends think.Model {
             console.log(terms);
             let new_set_terms = [];
             terms.forEach((term) => {
-                new_set_terms.push({tid: term.tid, sid});
+                new_set_terms.push({tid: term.tid, sid, uid: set.uid});
             });
             await set_termDB.addMany(new_set_terms);
             await this.commit();
@@ -61,7 +62,14 @@ module.exports = class extends think.Model {
             let termDB = await this.model('term').db(this.db());
             let set_termDB = await this.model('set_term').db(this.db());
             await this.startTrans();
-            let set = await this.where({sid}).find();
+            let set = await this.where({sid,origin_id}).find();
+            if(think.isEmpty(set)){
+                await this.rollback();
+                return {
+                    errno:401,
+                    errmsg:'该单词集不存在'
+                };
+            }
             let terms = await termDB.where({origin_id}).select();
             let set_terms = await set_termDB.where({sid}).select();
             set_terms.forEach((set_term) => {
@@ -75,6 +83,7 @@ module.exports = class extends think.Model {
             })
             await this.commit();
             return {
+                errno:0,
                 set: set,
                 terms: terms
             }
@@ -84,15 +93,18 @@ module.exports = class extends think.Model {
         }
     }
 
-    //先保留，后面加了权限再改
-    async remove(sid) {
+    async remove(sid,origin_id) {
         try {
             let set_termDB = await this.model('set_term').db(this.db());
             await this.startTrans();
             await set_termDB.where({sid}).delete();
             await this.where({sid}).delete();
+            let sets=await this.where({origin_id}).select();
+            if(think.isEmpty(sets)){       //如果该单词集没有使用者
+                let termDB=await this.model('term').db(this.db());
+                await termDB.where({origin_id}).delete();
+            }
             await this.commit();
-            return sid;
         } catch (e) {
             await this.rollback();
             throw e;

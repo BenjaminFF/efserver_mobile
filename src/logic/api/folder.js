@@ -12,27 +12,6 @@ module.exports = class extends think.Logic {
                 required: true,
                 method: 'post',
                 length: {min: 0, max: 255}
-            },
-            authorid: {
-                string:true,
-                required: true,
-                method: 'post',
-                length: {min: 10, max: 12}
-            }
-        }
-        if (!this.validate(rules)) {
-            this.fail(402, '数据格式或者请求方法错误');
-            return false;
-        }
-    }
-
-    listAction() {
-        let rules = {
-            authorid: {
-                string:true,
-                required: true,
-                method: 'post',
-                length: {min: 10, max: 12}
             }
         }
         if (!this.validate(rules)) {
@@ -68,6 +47,14 @@ module.exports = class extends think.Logic {
             this.fail(402, '数据格式或者请求方法错误');
             return false;
         }
+    }
+
+    addSetAction(){
+
+    }
+
+    listSetAction(){
+
     }
 
 }
