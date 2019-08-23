@@ -69,8 +69,18 @@ module.exports = class extends think.Controller {
     //list某个folder的set
     async listSetAction() {
         let fid = this.ctx.query.fid;
-        let uid = this.ctx.cookie('uid');
-        this.body = await model.listSet(this.ctx.query.fid);
+        let authorid = this.ctx.cookie('uid');
+        try {
+          let folder=await model.where({fid,authorid}).find();
+          if(think.isEmpty(folder)){
+            this.fail(401,'该folder不存在或者folder不属于该用户');
+          }else {
+            let sets= await model.listSet(this.ctx.query.fid);
+            this.success(sets,"查询该folder的单词集成功");
+          }
+        }catch (e) {
+          this.fail(403,"数据库异常");
+        }
     }
 
 

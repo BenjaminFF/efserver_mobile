@@ -70,7 +70,18 @@ module.exports = class extends think.Logic {
     }
 
     listSetAction(){
+        let rules = {
+            fid: {
+                int: true,
+                required: true,
+                method: 'get'
+            }
+        }
 
+        if (!this.validate(rules)) {
+            this.fail(402, '数据格式或者请求方法错误');
+            return false;
+        }
     }
 
 }

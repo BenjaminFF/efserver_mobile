@@ -10,9 +10,17 @@ module.exports = class extends think.Model {
   }
 
   async listSet(fid){
-    let folderSetDB = await this.model('folder_set').db(this.db());
-    let sids=await folderSetDB.where({fid:fid}).getField('sid');
-    return sids;
+    try {
+      let folder_setDB = await this.model('folder_set').db(this.db());
+      let setDB=await this.model('set').db(this.db());
+      let sids=await folder_setDB.where({fid:fid}).getField('sid');
+      console.log(sids);
+      let sets=await setDB.where({sid:['IN',sids]}).select();
+      return sets;
+    }catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
   async addSet(fid,sid,authorid){
@@ -26,7 +34,7 @@ module.exports = class extends think.Model {
       }
 
       let setDB = await this.model('set').db(this.db());
-      let set = await setDB.where({sid, authorid}).find();
+      let set = await setDB.where({sid, uid:authorid}).find();
       if (think.isEmpty(set)) {
         return {
           errno:401,
@@ -41,7 +49,6 @@ module.exports = class extends think.Model {
         errmsg:"添加单词集成功"
       }
     }catch (e) {
-      console.log(e);
       throw e;
     }
   }
