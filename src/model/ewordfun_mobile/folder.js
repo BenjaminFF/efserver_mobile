@@ -84,4 +84,25 @@ module.exports = class extends think.Model {
       throw error;
     }
   }
+
+  async mDelete(fid, authorid) {
+    try {
+      const affectedRows = await this.where({fid, authorid}).delete();
+      if (affectedRows === 0) {
+        return {
+          errno: 401,
+          errmsg: '该folder不存在或folder不属于该单词集'
+        };
+      } else {
+        const folderSetDB = await this.model('folder_set').db(this.db());
+        await folderSetDB.where({fid}).delete();
+        return {
+          errno: 0,
+          errmsg: '删除成功'
+        };
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 };

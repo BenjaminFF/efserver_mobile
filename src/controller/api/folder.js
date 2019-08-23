@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
 const uniqid = require('uniqid');
@@ -50,7 +52,7 @@ module.exports = class extends think.Controller {
     }
   }
 
-  // 只能add自己的set
+  // folder只能add自己的set，先检查sid和fid是否属于该用户(注意判断set是否属于该用户是判断的uid)，然后再向folder_set里面添加数据
   async addSetAction() {
     const fid = this.ctx.post('fid');
     const sid = this.ctx.post('sid');
@@ -85,6 +87,7 @@ module.exports = class extends think.Controller {
     }
   }
 
+  // 先检查sid和fid是否属于该用户(注意判断set是否属于该用户是判断的uid)，然后再删除folder_set里面的记录
   async removeSetAction() {
     const fid = this.ctx.post('fid');
     const sid = this.ctx.post('sid');
@@ -100,8 +103,19 @@ module.exports = class extends think.Controller {
       this.fail(403, '数据库异常');
     }
   }
-
+  // 先查询这个folder是否属于该用户，然后再删除该folder和folder_set里面关于该folder的记录
   async deleteAction() {
-    await model.where({fid: this.ctx.post('fid')}).delete();
+    const fid = this.ctx.post('fid');
+    const authorid = this.ctx.cookie('uid');
+    try {
+      const data = await model.mDelete(fid, authorid);
+      if (data.errno == 0) {
+        this.success({fid}, data.errmsg);
+      } else {
+        this.fail(data.errno, data.errmsg);
+      }
+    } catch (error) {
+      this.fail(403, '数据库异常');
+    }
   }
 };
