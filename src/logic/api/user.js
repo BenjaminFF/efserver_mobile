@@ -1,6 +1,8 @@
+/* eslint-disable spaced-comment */
+/* eslint-disable no-console */
 module.exports = class extends think.Logic {
   addAction() {
-    let rules = {
+    const rules = {
       name: {
         string: true,
         required: true,
@@ -26,7 +28,7 @@ module.exports = class extends think.Logic {
   }
 
   loginAction() {
-    let rules = {
+    const rules = {
       password: {
         string: true,
         required: true,
@@ -39,13 +41,13 @@ module.exports = class extends think.Logic {
         method: 'post',
         length: {max: 64}
       },
-      timestamp:{
+      timestamp: {
         required: true,
         int: true,
         method: 'post'
       },
-      nonce:{
-        string:true,
+      nonce: {
+        string: true,
         required: true,
         method: 'post',
         length: {min: 12, max: 64}
@@ -67,7 +69,7 @@ module.exports = class extends think.Logic {
   }
 
   sendPWChangeMailAction() {
-    let rules = {
+    const rules = {
       email: {
         required: true,
         email: true,
@@ -84,12 +86,12 @@ module.exports = class extends think.Logic {
     }
   }
 
-  updatePasswordAction(){
-    let rules = {
+  updatePasswordAction() {
+    const rules = {
       uid_uniqidmd5: {
         required: true,
         string: true,
-        method: 'post',
+        method: 'post'
       },
       newPass: {
         required: true,
@@ -106,5 +108,3 @@ module.exports = class extends think.Logic {
     }
   }
 };
-
-
