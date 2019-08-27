@@ -1,8 +1,9 @@
 module.exports = class extends think.Logic {
   addAction() {
     const rules = {
-      sid: {
-        int: true,
+      origin_id: {
+        string: true,
+        length: {min: 10, max: 12},
         required: true,
         method: 'post'
       },
