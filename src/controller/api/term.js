@@ -5,6 +5,7 @@
 /* eslint-disable no-unused-vars */
 const uniqid = require('uniqid');
 const model = think.model('ewordfun_mobile/term');
+const setTermModel = think.model('ewordfun_mobile/set_term');
 module.exports = class extends think.Controller {
   __before() {
     // 添加权限
@@ -55,6 +56,18 @@ module.exports = class extends think.Controller {
         this.fail(data.errno, data.errmsg);
       }
     } catch (error) {
+      this.fail(403, '数据库异常');
+    }
+  }
+
+  async updateRecordAction() {
+    const termRecord = JSON.parse(this.ctx.post('termRecord'));
+    const uid = this.ctx.cookie('uid');
+    try {
+      const affectedRows = await setTermModel.where({tid: termRecord.tid, sid: termRecord.sid, uid}).update(termRecord);
+      this.success({affectedRows}, '更新成功');
+    } catch (error) {
+      console.log(error);
       this.fail(403, '数据库异常');
     }
   }
