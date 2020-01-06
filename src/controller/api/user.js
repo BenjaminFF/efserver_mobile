@@ -5,14 +5,15 @@ const uniqid = require('uniqid');
 const model = think.model('ewordfun_mobile/user');
 const svgCaptcha = require('svg-captcha');
 const nodemailer = require('nodemailer');
+const randomstring = require("randomstring");
 module.exports = class extends think.Controller {
   async __before() {
     const nonce_urls = ['/api/user/login', '/api/user/validate']; // 需要保持每次请求唯一性的url
     if (nonce_urls.includes(this.ctx.url)) {
-      console.log(Date.now());
+      console.log(Date.now())
       const timestamp = this.ctx.post('timestamp');
       const nonce = this.ctx.post('nonce');
-      if (Date.now() - timestamp > 60 * 1000) {
+      if (Math.abs(Date.now() - timestamp) > 60 * 1000) {
         this.fail(406, '非法请求');
         return false;
       }
@@ -56,7 +57,7 @@ module.exports = class extends think.Controller {
     const email = this.ctx.post('email');
     const password = think.md5(this.ctx.post('password'));
     try {
-      const data = await model.where({email: email, password: password}).find();
+      const data = await model.where({ email: email, password: password }).find();
       if (think.isEmpty(data)) {
         this.fail(401, '账号或密码错误');
       } else {
@@ -66,17 +67,18 @@ module.exports = class extends think.Controller {
           uid: data.uid,
           loginTime,
           autoExpireTime,
-          uip: this.ctx.header['x-real-ip']
+          randomstring:randomstring.generate(12),
+          uip: this.ctx.header['x-real-ip'],
         };
-        await this.cookie('uid', userInfo.uid, {maxAge: 24 * 3600 * 1000 * 20});
-        await this.cache(userInfo.uid, JSON.stringify(userInfo), {
+        await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20 });
+        await this.cookie(userInfo.uid, think.md5(JSON.stringify(userInfo)), { maxAge: 24 * 3600 * 1000 * 20 });
+        await this.session(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
           type: 'redis',
           redis: {
             timeout: 24 * 3600 * 1000 * 20
           }
         });
-        await this.session(userInfo.uid, JSON.stringify(userInfo), {maxAge: 24 * 3600 * 1000 * 20});
-        this.success({email: data.email, name: data.name}, '登录成功');
+        this.success({ email: data.email, name: data.name }, '登录成功');
       }
     } catch (e) {
       this.fail(403, '数据库异常');
@@ -102,18 +104,18 @@ module.exports = class extends think.Controller {
       // 更新session和redis里面的userInfo
       await this.cache(uid, JSON.stringify(parsedUserInfo), 'redis');
       await this.session(uid, JSON.stringify(parsedUserInfo));
-      this.body = {validated: true};
+      this.body = { validated: true };
     } else {
-      this.body = {validated: false};
+      this.body = { validated: false };
     }
   }
 
   // -1 用户未注册 -2 邮件发送失败 1 邮件发送成功
   async sendPWChangeMailAction() { // 需要做是否存在该用户验证
     const email = this.ctx.post('email');
-    const user = await model.where({email: email}).find();
+    const user = await model.where({ email: email }).find();
     if (think.isEmpty(user)) {
-      this.body = {msg: '用户不存在，请注册', code: -1};
+      this.body = { msg: '用户不存在，请注册', code: -1 };
       return;
     }
     const uniqidmd5 = think.md5(uniqid.process());
@@ -143,10 +145,10 @@ module.exports = class extends think.Controller {
     };
     const sendInfo = await transporter.sendMail(mailOptions);
     if (sendInfo.accepted.length != 0) { // 发送失败的还没有测试
-      await this.cache(user.uid + 'pwchange', uniqidmd5, {type: 'redis', redis: {timeout: 24 * 3600 * 1000}});
-      this.body = {msg: '邮件发送成功', code: 1};
+      await this.cache(user.uid + 'pwchange', uniqidmd5, { type: 'redis', redis: { timeout: 24 * 3600 * 1000 } });
+      this.body = { msg: '邮件发送成功', code: 1 };
     } else {
-      this.body = {msg: '邮件发送失败', code: -2};
+      this.body = { msg: '邮件发送失败', code: -2 };
     }
   }
 
@@ -167,7 +169,7 @@ module.exports = class extends think.Controller {
     const uid = uid_uniqidmd5.split('-')[0];
     const mUniqidmd5 = await this.ctx.cache(uid + 'pwchange', undefined, 'redis');
     if (mUniqidmd5 != undefined && mUniqidmd5 == uid_uniqidmd5.split('-')[1]) {
-      await model.where({uid: uid}).update({password: think.md5(newPass)});
+      await model.where({ uid: uid }).update({ password: think.md5(newPass) });
       await this.cache(uid + 'pwchange', null, 'redis');
       this.body = {
         msg: 'change pass success!',

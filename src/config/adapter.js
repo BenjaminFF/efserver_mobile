@@ -1,9 +1,7 @@
-const fileCache = require('think-cache-file');
 const redisCache = require('think-cache-redis');
 const nunjucks = require('think-view-nunjucks');
-const fileSession = require('think-session-file');
 const mysql = require('think-model-mysql');
-const {Console, File, DateFile} = require('think-logger3');
+const { Console, File, DateFile } = require('think-logger3');
 const path = require('path');
 const isDev = think.env === 'development';
 
@@ -21,12 +19,6 @@ exports.cache = {
     port: 6379,
     host: '127.0.0.1',
     password: ''
-  },
-  file: {
-    handle: fileCache,
-    cachePath: path.join(think.ROOT_PATH, 'runtime/cache'), // absoulte path is necessarily required
-    pathDepth: 1,
-    gcInterval: 24 * 60 * 60 * 1000 // gc interval
   }
 };
 
@@ -43,14 +35,14 @@ exports.model = {
   },
   mysql: {
     handle: mysql,
-    database: 'ewordfun_mobile',
+    database: 'ewordfun',
     prefix: '',
     encoding: 'utf8mb4',
     host: '127.0.0.1',
     port: '3306',
     user: 'root',
     password: 'Iamaman.',
-    charset:"utf8mb4",
+    charset: "utf8mb4",
     dateStrings: true,
     connectionLimit: 10 // 连接池的连接个数，默认为 1
   }
@@ -61,18 +53,20 @@ exports.model = {
  * @type {Object}
  */
 exports.session = {
-  type: 'file',
+  type: 'redis',
+  redis: {
+    handle: redisCache,
+    port: 6379,
+    host: '127.0.0.1',
+    password: ''
+  },
   common: {
     cookie: {
-      name: 'ewordfun_mobile',
-      keys: ['userInfo'],
+      name: 'thinkjs',
       signed: true,
       httpOnly: true,
+      timeout: 24 * 60 * 60 * 1000 * 20 // millisecond
     }
-  },
-  file: {
-    handle: fileSession,
-    sessionPath: path.join(think.ROOT_PATH, 'runtime/session')
   }
 };
 

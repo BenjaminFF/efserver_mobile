@@ -4,7 +4,7 @@
 // 401 session not valid
 
 module.exports = options => {
-  return async(ctx, next) => {
+  return async (ctx, next) => {
     const validUrls = ['/api/user/login', '/api/user/add', '/api/user/sendPWChangeMail', '/api/user/updatePassword', '/']; // 不需要验证登录的url
     if (!validUrls.includes(ctx.url) && !ctx.url.includes('/resetPassword')) {
       const sessionValidated = await validateSession(ctx); // 以后再加个ip验证和登陆次数限制
@@ -26,7 +26,8 @@ async function validateSession(ctx) {
     return false;
   }
   const session_userInfo = await ctx.session(uid);
-  const userInfo = await ctx.cache(uid, undefined, 'redis');
+  console.log(session_userInfo)
+  const userInfo = await ctx.cookie(uid);
 
   if (userInfo == session_userInfo) {
     return true;
