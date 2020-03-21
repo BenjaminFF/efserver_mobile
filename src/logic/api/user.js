@@ -22,7 +22,6 @@ module.exports = class extends think.Logic {
         length: {max: 64}
       }
     };
-    console.log(this.validate(rules));
     return this.validate(rules);
     //return false;
   }

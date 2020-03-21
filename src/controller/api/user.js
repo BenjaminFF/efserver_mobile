@@ -10,7 +10,6 @@ module.exports = class extends think.Controller {
   async __before() {
     const nonce_urls = ['/api/user/login', '/api/user/validate']; // 需要保持每次请求唯一性的url
     if (nonce_urls.includes(this.ctx.url)) {
-      console.log(Date.now())
       const timestamp = this.ctx.post('timestamp');
       const nonce = this.ctx.post('nonce');
       if (Math.abs(Date.now() - timestamp) > 60 * 1000) {
@@ -67,12 +66,12 @@ module.exports = class extends think.Controller {
           uid: data.uid,
           loginTime,
           autoExpireTime,
-          randomstring:randomstring.generate(12),
+          randomstring: randomstring.generate(12),
           uip: this.ctx.header['x-real-ip'],
         };
-        await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20 });
+        await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20, httpOnly: false });
         await this.cookie(userInfo.uid, think.md5(JSON.stringify(userInfo)), { maxAge: 24 * 3600 * 1000 * 20 });
-        await this.session(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
+        await this.cache(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
           type: 'redis',
           redis: {
             timeout: 24 * 3600 * 1000 * 20
@@ -81,6 +80,7 @@ module.exports = class extends think.Controller {
         this.success({ email: data.email, name: data.name }, '登录成功');
       }
     } catch (e) {
+      console.log(e)
       this.fail(403, '数据库异常');
     }
   }
@@ -88,16 +88,15 @@ module.exports = class extends think.Controller {
   async logoutAction() {
     const uid = await this.cookie('uid');
     await this.cache(uid, null, 'redis');
-    await this.session(null);
     await this.cookie('uid', null);
-    this.body = 'ok';
+    await this.cookie(uid, null);
+    this.success('登出成功');
   }
 
   async validateAction() {
     const uid = this.ctx.cookie('uid');
     const userInfo = await this.cache(uid, undefined, 'redis');
     const session_userInfo = await this.session(uid);
-    console.log('session_userInfo' + session_userInfo);
     if (userInfo == session_userInfo) {
       const parsedUserInfo = JSON.parse(userInfo);
       parsedUserInfo.loginTime = Date.now();

@@ -37,7 +37,7 @@ module.exports = [
   },
   'logic',
   {
-    handle:'intercept'
+    handle: 'intercept'
   },
   'controller'
 ];

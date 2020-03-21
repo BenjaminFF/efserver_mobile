@@ -20,7 +20,7 @@ module.exports = class extends think.Controller {
     try {
       const data = await model.mAdd(origin_id, uid, term, definition);
       if (data.errno === 0) {
-        this.success({tid: data.tid}, data.errmsg);
+        this.success({ tid: data.tid }, data.errmsg);
       } else {
         this.fail(data.errno, data.errmsg);
       }
@@ -36,8 +36,8 @@ module.exports = class extends think.Controller {
     const uid = this.ctx.cookie('uid');
 
     try {
-      const affectedRows = await model.where({tid, authorid: uid}).update(model.beforeUpdate({term, definition}));
-      this.success({affectedRows}, '更新成功');
+      const affectedRows = await model.where({ tid, authorid: uid }).update(model.beforeUpdate({ term, definition }));
+      this.success({ affectedRows }, '更新成功');
     } catch (e) {
       this.fail(403, '数据库异常');
     }
@@ -51,7 +51,7 @@ module.exports = class extends think.Controller {
     try {
       const data = await model.mDelete(tid, origin_id, uid);
       if (data.errno === 0) {
-        this.success({tid}, data.errmsg);
+        this.success({ tid }, data.errmsg);
       } else {
         this.fail(data.errno, data.errmsg);
       }
@@ -60,14 +60,15 @@ module.exports = class extends think.Controller {
     }
   }
 
+  //不传tid更新全部
   async updateRecordAction() {
     const termRecord = JSON.parse(this.ctx.post('termRecord'));
     const uid = this.ctx.cookie('uid');
     try {
-      const affectedRows = await setTermModel.where({tid: termRecord.tid, sid: termRecord.sid, uid}).update(termRecord);
-      this.success({affectedRows}, '更新成功');
+      console.log(model.beforeUpdate({ tid: termRecord.tid, sid: termRecord.sid, uid }))
+      const affectedRows = await setTermModel.where(model.beforeUpdate({ tid: termRecord.tid, sid: termRecord.sid, uid })).update(termRecord);
+      this.success({ affectedRows }, '更新成功');
     } catch (error) {
-      console.log(error);
       this.fail(403, '数据库异常');
     }
   }

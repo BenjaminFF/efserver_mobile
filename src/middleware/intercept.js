@@ -5,33 +5,30 @@
 
 module.exports = options => {
   return async (ctx, next) => {
-    const validUrls = ['/api/user/login', '/api/user/add', '/api/user/sendPWChangeMail', '/api/user/updatePassword', '/']; // 不需要验证登录的url
-    if (!validUrls.includes(ctx.url) && !ctx.url.includes('/resetPassword')) {
-      const sessionValidated = await validateSession(ctx); // 以后再加个ip验证和登陆次数限制
-      if (sessionValidated) {
-        return next();
-      } else {
-        ctx.fail(405, '没有权限');
-        return false;
-      }
-    } else {
-      return next();
+    const noNeedValidUrls = ['/api/user/login', '/api/user/add', '/api/user/sendPWChangeMail', '/api/user/updatePassword']; // 不需要验证登录的url
+    const sessionValidated = await validateSession(ctx)
+
+    if (ctx.url.includes('/api/user/validate')) {
+      sessionValidated ? ctx.success('验证成功') : ctx.fail(405, '没有权限')
+      return false
     }
-  };
-};
 
+    if (noNeedValidUrls.includes(ctx.url) || sessionValidated) {
+      return next()
+    }
+
+    ctx.fail(405, '没有权限')
+    return false
+  }
+}
+
+// 以后再加个ip验证和登陆次数限制
 async function validateSession(ctx) {
-  const uid = await ctx.cookie('uid');
-  if (typeof uid != 'string' || uid.length == 0) {
-    return false;
-  }
-  const session_userInfo = await ctx.session(uid);
-  console.log(session_userInfo)
-  const userInfo = await ctx.cookie(uid);
+  const uid = await ctx.cookie('uid')
+  if (typeof uid != 'string' || uid.length == 0) return false
 
-  if (userInfo == session_userInfo) {
-    return true;
-  } else {
-    return false;
-  }
+  const m_userInfo = await ctx.cache(uid, undefined, 'redis')
+  const userInfo = await ctx.cookie(uid)
+
+  return userInfo == m_userInfo
 }

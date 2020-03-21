@@ -10,7 +10,7 @@ module.exports = {
     domain: '',
     path: '/',
     maxAge: 15 * 3600 * 1000 *20, // 10个小时
-    signed: true,
+    signed: false,
     httpOnly: true,
     keys: ['uid'] // 当 signed 为 true 时，使用 keygrip 库加密时的密钥
   }

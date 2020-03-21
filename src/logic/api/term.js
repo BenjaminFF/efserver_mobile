@@ -3,7 +3,7 @@ module.exports = class extends think.Logic {
     const rules = {
       origin_id: {
         string: true,
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         required: true,
         method: 'post'
       },
@@ -11,13 +11,13 @@ module.exports = class extends think.Logic {
         string: true,
         required: true,
         method: 'post',
-        length: {min: 1, max: 32}
+        length: { min: 1, max: 32 }
       },
       definition: {
         string: true,
         required: true,
         method: 'post',
-        length: {max: 512}
+        length: { max: 512 }
       }
     };
 
@@ -38,13 +38,13 @@ module.exports = class extends think.Logic {
         string: true,
         requiredWithOut: ['definition'],
         method: 'post',
-        length: {min: 1, max: 32}
+        length: { min: 1, max: 32 }
       },
       definition: {
         string: true,
         requiredWithOut: ['term'],
         method: 'post',
-        length: {max: 512}
+        length: { max: 512 }
       }
     };
 
@@ -58,7 +58,7 @@ module.exports = class extends think.Logic {
     const rules = {
       origin_id: {
         string: true,
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         required: true,
         method: 'post'
       },
@@ -75,7 +75,7 @@ module.exports = class extends think.Logic {
     }
   }
 
-  updateRecordAction() {
+  updateRecordsAction() {
     try {
       const rules = {
         termRecord: {
@@ -84,7 +84,7 @@ module.exports = class extends think.Logic {
           method: 'post',
           jsonSchema: {
             'type': 'object',
-            'required': ['tid', 'sid'],
+            'required': ['sid'],
             // "maxProperties": 6,
             'properties': {
               'tid': {
