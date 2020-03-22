@@ -69,14 +69,19 @@ module.exports = class extends think.Controller {
           randomstring: randomstring.generate(12),
           uip: this.ctx.header['x-real-ip'],
         };
+        const userToken = await this.cache(data.uid, undefined, 'redis');  //多点登录
         await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20, httpOnly: false });
-        await this.cookie(userInfo.uid, think.md5(JSON.stringify(userInfo)), { maxAge: 24 * 3600 * 1000 * 20 });
-        await this.cache(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
-          type: 'redis',
-          redis: {
-            timeout: 24 * 3600 * 1000 * 20
-          }
-        });
+        if (userToken !== undefined) {
+          await this.cookie(userInfo.uid, userToken, { maxAge: 24 * 3600 * 1000 * 20 });
+        } else {
+          await this.cookie(userInfo.uid, think.md5(JSON.stringify(userInfo)), { maxAge: 24 * 3600 * 1000 * 20 });
+          await this.cache(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
+            type: 'redis',
+            redis: {
+              timeout: 24 * 3600 * 1000 * 20
+            }
+          });
+        }
         this.success({ email: data.email, name: data.name }, '登录成功');
       }
     } catch (e) {

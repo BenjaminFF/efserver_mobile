@@ -5,6 +5,7 @@
 
 module.exports = options => {
   return async (ctx, next) => {
+    console.log(Date.now())
     const noNeedValidUrls = ['/api/user/login', '/api/user/add', '/api/user/sendPWChangeMail', '/api/user/updatePassword']; // 不需要验证登录的url
     const sessionValidated = await validateSession(ctx)
 
