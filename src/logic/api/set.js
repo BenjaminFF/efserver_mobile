@@ -5,12 +5,12 @@ module.exports = class extends think.Logic {
         string: true,
         required: true,
         method: 'post',
-        length: {min: 1, max: 30}
+        length: { min: 1, max: 30 }
       },
       description: {
         string: true,
         method: 'post',
-        length: {max: 255}
+        length: { max: 255 }
       },
       terms: {
         required: true,
@@ -50,12 +50,12 @@ module.exports = class extends think.Logic {
     const rules = {
       authorid: {
         string: true,
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         required: true,
         method: 'post'
       },
       origin_id: {
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         string: true,
         required: true,
         method: 'post'
@@ -76,7 +76,7 @@ module.exports = class extends think.Logic {
         method: 'get'
       },
       origin_id: {
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         string: true,
         required: true,
         method: 'get'
@@ -114,7 +114,7 @@ module.exports = class extends think.Logic {
               },
               'description': {
                 'type': 'string',
-                'minLength': 1,
+                'minLength': 0,
                 'maxLength': 255
               }
             },
@@ -149,16 +149,28 @@ module.exports = class extends think.Logic {
               'sid': {
                 'type': 'number'
               },
-              'spell_comb_learncount': {
+              'learn_count': {
                 'type': 'number'
               },
-              'write_learncount': {
+              'multichoice_learncount': {
+                'type': 'number'
+              },
+              'wordcomb_learncount': {
+                'type': 'number'
+              },
+              'wordspell_learncount': {
                 'type': 'number'
               },
               'stared': {
                 'type': 'number',
                 'minimum': 0,
                 'maximum': 1
+              },
+              'latestlearntime': {
+                'type': 'number'
+              },
+              'startplantime': {
+                'type': 'number'
               }
             },
             'additionalProperties': false
@@ -183,7 +195,7 @@ module.exports = class extends think.Logic {
         method: 'post'
       },
       origin_id: {
-        length: {min: 10, max: 12},
+        length: { min: 10, max: 12 },
         string: true,
         required: true,
         method: 'post'

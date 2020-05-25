@@ -75,7 +75,7 @@ module.exports = class extends think.Logic {
     }
   }
 
-  updateRecordsAction() {
+  updateRecordAction() {
     try {
       const rules = {
         termRecord: {
@@ -93,12 +93,22 @@ module.exports = class extends think.Logic {
               'sid': {
                 'type': 'number'
               },
-              'spell_comb_learned': {
+              'wordspell_learned': {
                 'type': 'number',
                 'minimum': 0,
                 'maximum': 1
               },
-              'write_learned': {
+              'wordcomb_learned': {
+                'type': 'number',
+                'minimum': 0,
+                'maximum': 1
+              },
+              'multichoice_learned': {
+                'type': 'number',
+                'minimum': 0,
+                'maximum': 1
+              },
+              'learned': {
                 'type': 'number',
                 'minimum': 0,
                 'maximum': 1

@@ -65,7 +65,6 @@ module.exports = class extends think.Controller {
     const termRecord = JSON.parse(this.ctx.post('termRecord'));
     const uid = this.ctx.cookie('uid');
     try {
-      console.log(model.beforeUpdate({ tid: termRecord.tid, sid: termRecord.sid, uid }))
       const affectedRows = await setTermModel.where(model.beforeUpdate({ tid: termRecord.tid, sid: termRecord.sid, uid })).update(termRecord);
       this.success({ affectedRows }, '更新成功');
     } catch (error) {

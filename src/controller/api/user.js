@@ -69,7 +69,7 @@ module.exports = class extends think.Controller {
           randomstring: randomstring.generate(12),
           uip: this.ctx.header['x-real-ip'],
         };
-        const userToken = await this.cache(data.uid, undefined, 'redis');  //多点登录
+        const userToken = await this.cache(data.uid, undefined, 'redis');  //实现多点登录
         await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20, httpOnly: false });
         if (userToken !== undefined) {
           await this.cookie(userInfo.uid, userToken, { maxAge: 24 * 3600 * 1000 * 20 });
