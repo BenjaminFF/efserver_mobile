@@ -71,6 +71,7 @@ module.exports = class extends think.Controller {
     try {
       const uid = this.ctx.cookie('uid');
       const sets = await model.where({uid}).select();
+      console.log(uid);
       this.success({sets}, '查找sets成功');
     } catch (e) {
       this.fail(403, '数据库异常');

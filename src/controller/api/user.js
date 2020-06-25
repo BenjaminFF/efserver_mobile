@@ -71,10 +71,11 @@ module.exports = class extends think.Controller {
         };
         const userToken = await this.cache(data.uid, undefined, 'redis');  //实现多点登录
         await this.cookie('uid', userInfo.uid, { maxAge: 24 * 3600 * 1000 * 20, httpOnly: false });
+        let token = '';
         if (userToken !== undefined) {
-          await this.cookie(userInfo.uid, userToken, { maxAge: 24 * 3600 * 1000 * 20 });
+          token = userToken;
         } else {
-          await this.cookie(userInfo.uid, think.md5(JSON.stringify(userInfo)), { maxAge: 24 * 3600 * 1000 * 20 });
+          token = think.md5(JSON.stringify(userInfo));
           await this.cache(userInfo.uid, think.md5(JSON.stringify(userInfo)), {
             type: 'redis',
             redis: {
@@ -82,10 +83,11 @@ module.exports = class extends think.Controller {
             }
           });
         }
-        this.success({ email: data.email, name: data.name }, '登录成功');
+        await this.cookie(userInfo.uid, token, { maxAge: 24 * 3600 * 1000 * 20 });
+        this.success({ email: data.email, name: data.name, uid: userInfo.uid, token }, '登录成功');
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
       this.fail(403, '数据库异常');
     }
   }
